@@ -101,3 +101,11 @@ CREATE TABLE equipped (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+CREATE OR REPLACE VIEW character_items AS
+	SELECT c.character_id, c.name AS character_name, it.name AS item_name, it.armor, it.damage
+		FROM characters c
+			INNER JOIN inventory i
+				ON c.character_id = i.character_id
+			INNER JOIN item it
+				ON i.item_id = it.item_id;
