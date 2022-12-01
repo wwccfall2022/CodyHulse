@@ -165,7 +165,7 @@ BEGIN
     DECLARE armor INT UNSIGNED;
     DECLARE damage INT UNSIGNED;
     DECLARE result INT UNSIGNED;
-    DECLARE hp INT UNSIGNED;
+    DECLARE hp INT SIGNED;
     
     SELECT armor_total(defender_id) INTO armor;
     
