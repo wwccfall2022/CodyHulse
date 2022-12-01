@@ -238,17 +238,18 @@ BEGIN
 			INNER JOIN characters c
 				ON tm.character_id = c.character_id
 			WHERE tm.team_id = team;
-	
     DECLARE CONTINUE HANDLER FOR NOT FOUND
-        SET row_not_found = TRUE;
-        
+        	SET row_not_found = TRUE;
+	
+    DELETE FROM winners;
+    
     OPEN team_cursor;
     team_loop : LOOP
     
     FETCH team_cursor INTO char_id, char_name;
     
     IF row_not_found THEN
-        LEAVE team_loop;
+        	LEAVE team_loop;
     END IF;
     
     INSERT INTO winners
