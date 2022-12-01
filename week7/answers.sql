@@ -226,5 +226,37 @@ BEGIN
     
     INSERT INTO inventory (character_id, item_id) VALUES (char_id, item);
 END ;;
+
+CREATE PROCEDURE set_winners(team INT UNSIGNED)
+BEGIN
+    DECLARE char_id INT UNSIGNED;
+    DECLARE char_name VARCHAR(30);
+    DECLARE row_not_found TINYINT DEFAULT FALSE;
+    DECLARE team_cursor CURSOR FOR
+		SELECT tm.character_id, c.name
+			FROM team_members tm
+			INNER JOIN characters c
+				ON tm.character_id = c.character_id
+			WHERE tm.team_id = team;
+	
+    DECLARE CONTINUE HANDLER FOR NOT FOUND
+        SET row_not_found = TRUE;
+        
+    OPEN team_cursor;
+    team_loop : LOOP
+    
+    FETCH team_cursor INTO char_id, char_name;
+    
+    IF row_not_found THEN
+        LEAVE team_loop;
+    END IF;
+    
+    INSERT INTO winners
+        (character_id, name)
+    VALUES
+        (char_id, char_name);
+        
+    END LOOP team_loop;
+END ;;
 	
 DELIMITER ;
