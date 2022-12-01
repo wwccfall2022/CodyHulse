@@ -137,3 +137,19 @@ CREATE OR REPLACE VIEW team_items AS
 			INNER JOIN items it
 				ON e.item_id = it.item_id
 	ORDER BY item_name ASC;
+
+DELIMITER ;;
+
+CREATE FUNCTION armor_total(character_id INT UNSIGNED)
+	RETURNS INT UNSIGNED
+	DETERMINISTIC
+	BEGIN
+		DECLARE total INT UNSIGNED;
+        SELECT SUM(it.armor) INTO total
+			FROM items it
+				INNER JOIN equipped e
+			WHERE character_id = e.character;
+        RETURN total;
+	END ;;
+
+DELIMITER ;
