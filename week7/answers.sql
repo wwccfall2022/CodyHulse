@@ -105,37 +105,37 @@ CREATE TABLE equipped (
 CREATE OR REPLACE VIEW character_items AS
 	SELECT c.character_id, c.name AS character_name, it.name AS item_name, it.armor, it.damage
 		FROM characters c
-			INNER JOIN inventory i
-				ON c.character_id = i.character_id
-			INNER JOIN items it
-				ON i.item_id = it.item_id
+		INNER JOIN inventory i
+			ON c.character_id = i.character_id
+		INNER JOIN items it
+			ON i.item_id = it.item_id
 	UNION
 	SELECT c.character_id, c.name AS character_name, it.name AS item_name, it.armor, it.damage
 		FROM characters c
-			INNER JOIN equipped e
-				ON c.character_id = e.character_id
-			INNER JOIN items it
-				ON e.item_id = it.item_id
+		INNER JOIN equipped e
+			ON c.character_id = e.character_id
+		INNER JOIN items it
+			ON e.item_id = it.item_id
 	ORDER BY item_name ASC;
 
 CREATE OR REPLACE VIEW team_items AS
 	SELECT t.team_id, t.name AS team_name, it.name AS item_name, it.armor, it.damage
 		FROM teams t
-			INNER JOIN team_members tm
-				ON t.team_id = tm.team_id
-			INNER JOIN inventory i
-				ON tm.character_id = i.character_id
-			INNER JOIN items it
-				ON i.item_id = it.item_id
+		INNER JOIN team_members tm
+			ON t.team_id = tm.team_id
+		INNER JOIN inventory i
+			ON tm.character_id = i.character_id
+		INNER JOIN items it
+			ON i.item_id = it.item_id
 	UNION
 	SELECT t.team_id, t.name AS team_name, it.name AS item_name, it.armor, it.damage
 		FROM teams t
-			INNER JOIN team_members tm
-				ON t.team_id = tm.team_id
-			INNER JOIN equipped e
-				ON tm.character_id = e.character_id
-			INNER JOIN items it
-				ON e.item_id = it.item_id
+		INNER JOIN team_members tm
+			ON t.team_id = tm.team_id
+		INNER JOIN equipped e
+			ON tm.character_id = e.character_id
+		INNER JOIN items it
+			ON e.item_id = it.item_id
 	ORDER BY item_name ASC;
 
 DELIMITER ;;
@@ -149,8 +149,8 @@ BEGIN
 	
 	SELECT SUM(it.armor) INTO gear_ac
 		FROM items it
-			INNER JOIN equipped e
-				ON it.item_id = e.item_id
+		INNER JOIN equipped e
+			ON it.item_id = e.item_id
 		WHERE character_id = e.character_id;
 	
 	SELECT cs.armor INTO natural_ac
@@ -171,8 +171,8 @@ BEGIN
     
     SELECT it.damage INTO damage
 		FROM equipped e
-			INNER JOIN items it
-				ON e.item_id = it.item_id
+		INNER JOIN items it
+			ON e.item_id = it.item_id
 		WHERE e.equipped_id = weapon_id;
         
     SET result = damage - armor;
@@ -196,13 +196,9 @@ BEGIN
     DECLARE char_id INT UNSIGNED;
     DECLARE item INT UNSIGNED;
     
-    SELECT i.character_id INTO char_id
+    SELECT i.character_id, i.item_id INTO char_id, item
 		FROM inventory i
-        	WHERE equip_id = i.inventory_id;
-	
-    SELECT i.item_id INTO item
-		FROM inventory i
-        	WHERE equip_id = i.inventory_id;
+		WHERE equip_id = i.inventory_id;
 	
     DELETE FROM inventory WHERE inventory_id = equip_id;
     
@@ -214,13 +210,9 @@ BEGIN
     DECLARE char_id INT UNSIGNED;
     DECLARE item INT UNSIGNED;
     
-    SELECT e.character_id INTO char_id
+    SELECT e.character_id, e.item_id INTO char_id, item
 		FROM equipped e
-        	WHERE unequip_id = e.equipped_id;
-	
-    SELECT e.item_id INTO item
-		FROM equipped e
-        	WHERE unequip_id = e.equipped_id;
+		WHERE unequip_id = e.equipped_id;
 	
     DELETE FROM equipped WHERE equipped_id = unequip_id;
     
@@ -258,6 +250,8 @@ BEGIN
         (char_id, char_name);
         
     END LOOP team_loop;
+    
+    CLOSE team_cursor;
 END ;;
 	
 DELIMITER ;
