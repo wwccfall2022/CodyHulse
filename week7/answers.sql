@@ -169,15 +169,6 @@ BEGIN
     
     SELECT armor_total(defender_id) INTO armor;
     
-    CREATE PROCEDURE attack(defender_id INT UNSIGNED, weapon_id INT UNSIGNED)
-BEGIN
-	DECLARE armor INT UNSIGNED;
-    DECLARE damage INT UNSIGNED;
-    DECLARE result INT UNSIGNED;
-    DECLARE hp INT UNSIGNED;
-    
-    SELECT armor_total(defender_id) INTO armor;
-    
     SELECT it.damage INTO damage
 		FROM equipped e
 			INNER JOIN items it
@@ -198,21 +189,6 @@ BEGIN
 		UPDATE character_stats SET health = hp WHERE character_id = defender_id;
     END IF;
     
-END ;;
-        
-	SET @result = damage - armor;
-    
-    SELECT cs.health INTO hp
-		FROM character_stats cs
-        WHERE defender_id = cs.character_id;
-    
-    IF result > 0 THEN
-		SET @hp = hp - result;
-			IF hp <= 0 THEN
-				DELETE FROM characters WHERE character_id = defender_id;
-			END IF;
-		UPDATE character_stats SET health = hp WHERE character_id = defender_id;
-    END IF;
 END ;;
 	
 DELIMITER ;
