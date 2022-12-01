@@ -107,5 +107,5 @@ CREATE OR REPLACE VIEW character_items AS
 		FROM characters c
 			INNER JOIN inventory i
 				ON c.character_id = i.character_id
-			INNER JOIN item it
+			INNER JOIN items it
 				ON i.item_id = it.item_id;
