@@ -162,7 +162,7 @@ END ;;
 
 CREATE PROCEDURE attack(defender_id INT UNSIGNED, weapon_id INT UNSIGNED)
 BEGIN
-	DECLARE armor INT UNSIGNED;
+    DECLARE armor INT UNSIGNED;
     DECLARE damage INT UNSIGNED;
     DECLARE result INT UNSIGNED;
     DECLARE hp INT UNSIGNED;
@@ -175,11 +175,11 @@ BEGIN
 				ON e.item_id = it.item_id
 		WHERE e.equipped_id = weapon_id;
         
-	SET result = damage - armor;
+    SET result = damage - armor;
     
     SELECT cs.health INTO hp
 		FROM character_stats cs
-        WHERE defender_id = cs.character_id;
+        	WHERE defender_id = cs.character_id;
     
     IF result > 0 THEN
 		SET hp = hp - result;
