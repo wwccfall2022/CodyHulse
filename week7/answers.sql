@@ -164,7 +164,7 @@ CREATE PROCEDURE attack(defender_id INT UNSIGNED, weapon_id INT UNSIGNED)
 BEGIN
     DECLARE armor INT UNSIGNED;
     DECLARE damage INT UNSIGNED;
-    DECLARE result INT UNSIGNED;
+    DECLARE result INT SIGNED;
     DECLARE hp INT SIGNED;
     
     SELECT armor_total(defender_id) INTO armor;
