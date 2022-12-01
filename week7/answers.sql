@@ -184,6 +184,7 @@ BEGIN
 			IF hp <= 0 THEN
 				DELETE FROM characters WHERE character_id = defender_id;
 			END IF;
+		UPDATE character_stats SET health = hp WHERE character_id = defender_id;
     END IF;
 END ;;
 	
