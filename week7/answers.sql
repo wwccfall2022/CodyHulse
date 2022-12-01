@@ -141,23 +141,50 @@ CREATE OR REPLACE VIEW team_items AS
 DELIMITER ;;
 
 CREATE FUNCTION armor_total(character_id INT UNSIGNED)
-	RETURNS INT UNSIGNED
-	DETERMINISTIC
-	BEGIN
-		DECLARE gear_ac INT UNSIGNED;
-        	DECLARE natural_ac INT UNSIGNED;
+RETURNS INT UNSIGNED
+DETERMINISTIC
+BEGIN
+	DECLARE gear_ac INT UNSIGNED;
+	DECLARE natural_ac INT UNSIGNED;
+	
+	SELECT SUM(it.armor) INTO gear_ac
+		FROM items it
+			INNER JOIN equipped e
+				ON it.item_id = e.item_id
+		WHERE character_id = e.character_id;
+	
+	SELECT cs.armor INTO natural_ac
+		FROM character_stats cs
+		WHERE character_id = cs.character_id;
+	
+	RETURN gear_ac + natural_ac;
+END ;;
+
+CREATE PROCEDURE attack(defender_id INT UNSIGNED, weapon_id INT UNSIGNED)
+BEGIN
+	DECLARE armor INT UNSIGNED;
+    DECLARE damage INT UNSIGNED;
+    DECLARE result INT UNSIGNED;
+    DECLARE hp INT UNSIGNED;
+    
+    SELECT armor_total(defender_id) INTO armor;
+    
+    SELECT it.damage INTO damage
+		FROM items it
+		WHERE weapon_id = it.item_id;
         
-        SELECT SUM(it.armor) INTO gear_ac
-			FROM items it
-				LEFT OUTER JOIN equipped e
-					ON it.item_id = e.item_id
-				WHERE character_id = e.character_id;
-		
-        SELECT cs.armor INTO natural_ac
-			FROM character_stats cs
-				WHERE character_id = cs.character_id;
-        
-        RETURN gear_ac + natural_ac;
-	END ;;
+	SET @result = damage - armor;
+    
+    SELECT cs.health INTO hp
+		FROM character_stats cs
+        WHERE defender_id = cs.character_id;
+    
+    IF result > 0 THEN
+		SET @hp = hp - result;
+			IF hp <= 0 THEN
+				DELETE FROM characters WHERE character_id = defender_id;
+			END IF;
+    END IF;
+END ;;
 	
 DELIMITER ;
