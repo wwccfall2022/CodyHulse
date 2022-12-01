@@ -144,12 +144,20 @@ CREATE FUNCTION armor_total(character_id INT UNSIGNED)
 	RETURNS INT UNSIGNED
 	DETERMINISTIC
 	BEGIN
-		DECLARE total INT UNSIGNED;
-        SELECT SUM(it.armor) INTO total
+		DECLARE gear_ac INT UNSIGNED;
+        	DECLARE natural_ac INT UNSIGNED;
+        
+        SELECT SUM(it.armor) INTO gear_ac
 			FROM items it
-				INNER JOIN equipped e
-			WHERE character_id = e.character;
-        RETURN total;
+				LEFT OUTER JOIN equipped e
+					ON it.item_id = e.item_id
+				WHERE character_id = e.character_id;
+		
+        SELECT cs.armor INTO natural_ac
+			FROM character_stats cs
+				WHERE character_id = cs.character_id;
+        
+        RETURN gear_ac + natural_ac;
 	END ;;
-
+	
 DELIMITER ;
