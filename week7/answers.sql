@@ -116,3 +116,4 @@ CREATE OR REPLACE VIEW character_items AS
 				ON c.character_id = e.character_id
 			INNER JOIN items it
 				ON e.item_id = it.item_id;
+	ORDER BY item_name ASC;
