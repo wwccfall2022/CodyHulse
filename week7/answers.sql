@@ -108,4 +108,11 @@ CREATE OR REPLACE VIEW character_items AS
 			INNER JOIN inventory i
 				ON c.character_id = i.character_id
 			INNER JOIN items it
-				ON i.item_id = it.item_id;
+				ON i.item_id = it.item_id
+	UNION
+	SELECT c.character_id, c.name AS character_name, it.name AS item_name, it.armor, it.damage
+		FROM characters c
+			INNER JOIN equipped e
+				ON c.character_id = e.character_id
+			INNER JOIN items it
+				ON e.item_id = it.item_id;
