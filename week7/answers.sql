@@ -190,5 +190,41 @@ BEGIN
     END IF;
     
 END ;;
+
+CREATE PROCEDURE equip(equip_id INT UNSIGNED)
+BEGIN
+    DECLARE char_id INT UNSIGNED;
+    DECLARE item INT UNSIGNED;
+    
+    SELECT i.character_id INTO char_id
+		FROM inventory i
+        	WHERE equip_id = i.inventory_id;
+	
+    SELECT i.item_id INTO item
+		FROM inventory i
+        	WHERE equip_id = i.inventory_id;
+	
+    DELETE FROM inventory WHERE inventory_id = equip_id;
+    
+    INSERT INTO equipped (character_id, item_id) VALUES (char_id, item);
+END ;;
+
+CREATE PROCEDURE unequip(unequip_id INT UNSIGNED)
+BEGIN
+    DECLARE char_id INT UNSIGNED;
+    DECLARE item INT UNSIGNED;
+    
+    SELECT e.character_id INTO char_id
+		FROM equipped e
+        	WHERE unequip_id = e.equipped_id;
+	
+    SELECT e.item_id INTO item
+		FROM equipped e
+        	WHERE unequip_id = e.equipped_id;
+	
+    DELETE FROM equipped WHERE equipped_id = unequip_id;
+    
+    INSERT INTO inventory (character_id, item_id) VALUES (char_id, item);
+END ;;
 	
 DELIMITER ;
