@@ -89,8 +89,8 @@ CREATE TRIGGER new_user
         
 		DECLARE user_cursor CURSOR FOR
         SELECT u.user_id, u.first_name, u.last_name
-			FROM users
-			WHERE user_id = NEW.user_id;
+			FROM users u
+			WHERE u.user_id = NEW.user_id;
 		DECLARE CONTINUE HANDLER FOR NOT FOUND
 			SET row_not_found = TRUE;
                 
