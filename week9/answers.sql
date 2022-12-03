@@ -79,45 +79,44 @@ DELIMITER ;;
 CREATE TRIGGER new_user
 	AFTER INSERT ON users
     FOR EACH ROW
-	BEGIN
-		DECLARE new_user_id INT UNSIGNED;
-		DECLARE content VARCHAR(70);
-        DECLARE new_first_name VARCHAR(30);
-        DECLARE new_last_name VARCHAR(30);
-        /*
-		DECLARE row_not_found TINYINT DEFAULT FALSE;
-        
-		DECLARE user_cursor CURSOR FOR
-        SELECT user_id, first_name, last_name
-			FROM users 
-			WHERE user_id = NEW.user_id;
-		DECLARE CONTINUE HANDLER FOR NOT FOUND
-			SET row_not_found = TRUE;
+BEGIN
+	DECLARE new_content VARCHAR(70);
+/*
+	DECLARE new_user_id INT UNSIGNED;
+	DECLARE new_first_name VARCHAR(30);
+	DECLARE new_last_name VARCHAR(30);
+	DECLARE row_not_found TINYINT DEFAULT FALSE;
+	
+	DECLARE user_cursor CURSOR FOR
+	SELECT user_id, first_name, last_name
+		FROM users 
+		WHERE user_id = NEW.user_id;
+	DECLARE CONTINUE HANDLER FOR NOT FOUND
+		SET row_not_found = TRUE;
+	
+	OPEN user_cursor;
+	user_loop : LOOP
+	
+	FETCH user_cursor INTO new_user_id, new_first_name, new_last_name;
+	
+	IF row_not_found THEN
+		LEAVE user_loop;
+	END IF;
+	
+	INSERT INTO posts
+		(user_id, content)
+	VALUES
+		(new_user_id, new_first_name + " " + new_last_name + " just joined!");
 		
-        
-        OPEN user_cursor;
-		user_loop : LOOP
-        
-        FETCH user_cursor INTO new_user_id, new_first_name, new_last_name;
-		
-		IF row_not_found THEN
-			LEAVE user_loop;
-		END IF;
-        */
-        
-        SELECT NEW.user_id INTO new_user_id;
-        SELECT NEW.first_name INTO new_first_name;
-        SELECT NEW.last_name INTO new_last_name;
-        
-		INSERT INTO posts
-			(user_id, content)
-		VALUES
-			(new_user_id, new_first_name + " " + new_last_name + " just joined!");
-		/*
-		END LOOP user_loop;
-		CLOSE user_cursor;
-        */
-	END ;;
+	END LOOP user_loop;
+	CLOSE user_cursor;
+*/
+	SELECT CONCAT(NEW.first_name, NEW.last_name, " just joined!") INTO new_content;
+	INSERT INTO posts
+		(user_id, content)
+	VALUES
+		(NEW.user_id, new_content);
+END ;;
 -- CREATE PROCEDURE add_post(user_id, content)
 -- 	INSERT INTO posts p (p.user_id, p.content) VALUES (user_id, content);
 
