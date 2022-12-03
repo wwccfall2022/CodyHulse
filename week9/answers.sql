@@ -66,14 +66,6 @@ CREATE TABLE notifications (
         ON DELETE CASCADE
 );
 
-CREATE OR REPLACE VIEW notification_posts AS
-	SELECT n.user_id, u.first_name, u.last_name, p.post_id, p.content
-		FROM users u
-		LEFT OUTER JOIN posts p
-			ON u.user_id = p.user_id
-		LEFT OUTER JOIN notifications n
-			ON p.user_id = n.user_id;
-
 DELIMITER ;; 
 
 CREATE TRIGGER new_user
@@ -84,16 +76,17 @@ CREATE TRIGGER new_user
 		DECLARE content VARCHAR(70);
         DECLARE new_first_name VARCHAR(30);
         DECLARE new_last_name VARCHAR(30);
-        
+        /*
 		DECLARE row_not_found TINYINT DEFAULT FALSE;
         
 		DECLARE user_cursor CURSOR FOR
-        SELECT u.user_id, u.first_name, u.last_name
-			FROM users u
-			WHERE u.user_id = NEW.user_id;
+        SELECT user_id, first_name, last_name
+			FROM users 
+			WHERE user_id = NEW.user_id;
 		DECLARE CONTINUE HANDLER FOR NOT FOUND
 			SET row_not_found = TRUE;
-                
+		
+        
         OPEN user_cursor;
 		user_loop : LOOP
         
@@ -102,6 +95,11 @@ CREATE TRIGGER new_user
 		IF row_not_found THEN
 			LEAVE user_loop;
 		END IF;
+        */
+        
+        SELECT NEW.user_id INTO new_user_id;
+        SELECT NEW.first_name INTO new_first_name;
+        SELECT NEW.last_name INTO new_last_name;
         
 		INSERT INTO posts
 			(user_id, content)
