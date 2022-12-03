@@ -66,6 +66,14 @@ CREATE TABLE notifications (
         ON DELETE CASCADE
 );
 
+CREATE OR REPLACE VIEW notification_posts AS
+	SELECT n.user_id, u.first_name, u.last_name, p.post_id, p.content
+		FROM users u
+		LEFT OUTER JOIN posts p
+			ON u.user_id = p.user_id
+		LEFT OUTER JOIN notifications n
+			ON p.user_id = n.user_id;
+
 DELIMITER ;; 
 
 CREATE TRIGGER new_user
@@ -105,9 +113,10 @@ CREATE TRIGGER new_user
 			(user_id, content)
 		VALUES
 			(new_user_id, new_first_name + " " + new_last_name + " just joined!");
-            
+		/*
 		END LOOP user_loop;
 		CLOSE user_cursor;
+        */
 	END ;;
 -- CREATE PROCEDURE add_post(user_id, content)
 -- 	INSERT INTO posts p (p.user_id, p.content) VALUES (user_id, content);
