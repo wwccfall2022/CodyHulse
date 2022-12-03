@@ -65,3 +65,53 @@ CREATE TABLE notifications (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+CREATE OR REPLACE VIEW notification_posts AS
+	SELECT n.user_id, u.first_name, u.last_name, p.post_id, p.content
+		FROM users u
+		LEFT OUTER JOIN posts p
+			ON u.user_id = p.user_id
+		LEFT OUTER JOIN notifications n
+			ON p.user_id = n.user_id;
+
+DELIMITER ;; 
+
+CREATE TRIGGER new_user
+	AFTER INSERT ON users
+    FOR EACH ROW
+	BEGIN
+		DECLARE new_user_id INT UNSIGNED;
+		DECLARE content VARCHAR(70);
+        DECLARE new_first_name VARCHAR(30);
+        DECLARE new_last_name VARCHAR(30);
+        
+		DECLARE row_not_found TINYINT DEFAULT FALSE;
+        
+		DECLARE user_cursor CURSOR FOR
+        SELECT u.user_id, u.first_name, u.last_name
+			FROM users
+			WHERE user_id = NEW.user_id;
+		DECLARE CONTINUE HANDLER FOR NOT FOUND
+			SET row_not_found = TRUE;
+                
+        OPEN user_cursor;
+		user_loop : LOOP
+        
+        FETCH user_cursor INTO new_user_id, new_first_name, new_last_name;
+		
+		IF row_not_found THEN
+			LEAVE user_loop;
+		END IF;
+        
+		INSERT INTO posts
+			(user_id, content)
+		VALUES
+			(new_user_id, new_first_name + " " + new_last_name + " just joined!");
+            
+		END LOOP user_loop;
+		CLOSE user_cursor;
+	END ;;
+-- CREATE PROCEDURE add_post(user_id, content)
+-- 	INSERT INTO posts p (p.user_id, p.content) VALUES (user_id, content);
+
+DELIMITER ; 
