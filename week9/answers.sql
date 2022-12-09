@@ -78,12 +78,13 @@ DELIMITER ;;
 
 CREATE TRIGGER new_user
 	AFTER INSERT ON users
-    FOR EACH ROW
+   	FOR EACH ROW
 BEGIN
 	DECLARE not_new_user INT UNSIGNED;
-    DECLARE recent_post INT UNSIGNED;
+   	DECLARE recent_post INT UNSIGNED;
+	DECLARE new_content VARCHAR(70);
 	DECLARE row_not_found TINYINT DEFAULT FALSE;
-    DECLARE user_cursor CURSOR FOR
+    	DECLARE user_cursor CURSOR FOR
 		SELECT u.user_id
 			FROM users u
 			WHERE u.user_id != NEW.user_id;
@@ -92,7 +93,7 @@ BEGIN
 		SET row_not_found = TRUE;
     
     -- Creates the user joined posts
-	SET @new_content = CONCAT(NEW.first_name, " ", NEW.last_name, " just joined!");
+	SET new_content = CONCAT(NEW.first_name, " ", NEW.last_name, " just joined!");
     
 	INSERT INTO posts
 		(user_id, content)
