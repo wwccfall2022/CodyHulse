@@ -98,7 +98,7 @@ BEGIN
 	INSERT INTO posts
 		(user_id, content)
 	VALUES
-		(NEW.user_id, @new_content);
+		(NEW.user_id, new_content);
         
 	SET recent_post = LAST_INSERT_ID();
 	
