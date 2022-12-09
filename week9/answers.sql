@@ -42,7 +42,7 @@ CREATE TABLE posts (
     user_id INT UNSIGNED NOT NULL,
     created_on TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_on TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE NOW(),
-    content VARCHAR(50) NOT NULL,
+    content VARCHAR(70) NOT NULL,
     CONSTRAINT posts_fk_users
         FOREIGN KEY (user_id)
         REFERENCES users (user_id)
@@ -133,7 +133,7 @@ BEGIN
 	DECLARE user_friends INT UNSIGNED;
 	DECLARE recent_post INT UNSIGNED;
 	DECLARE row_not_found TINYINT DEFAULT FALSE;
-	DECLARE post_cursor CURSOR FOR
+	DECLARE friend_cursor CURSOR FOR
 	    SELECT f.friend_id
 			FROM friends f
             WHERE f.user_id = posting_user_id;
@@ -150,13 +150,13 @@ BEGIN
 	SET recent_post = LAST_INSERT_ID();
 	
     -- Creates the notification posts
-	OPEN post_cursor;
-	post_loop : LOOP
+	OPEN friend_cursor;
+	friend_loop : LOOP
 	
-	FETCH post_cursor INTO user_friends;
+	FETCH friend_cursor INTO user_friends;
     
 	IF row_not_found THEN
-	    LEAVE post_loop;
+	    LEAVE friend_loop;
 	END IF;
         
 	INSERT INTO notifications
@@ -164,9 +164,9 @@ BEGIN
 	VALUES
 	    (user_friends, recent_post);
             
-	END LOOP post_loop;
+	END LOOP friend_loop;
         
-	CLOSE post_cursor;
+	CLOSE friend_cursor;
 END;;
 
 DELIMITER ; 
