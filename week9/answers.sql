@@ -128,7 +128,69 @@ BEGIN
 		WHERE updated_on < DATE_SUB(NOW(), INTERVAL 2 HOUR);
 END;;
 
--- CREATE PROCEDURE add_post(user_id, content)
+CREATE PROCEDURE add_post(posting_user_id INT UNSIGNED, posting_user_content VARCHAR(70))
+BEGIN
+	DECLARE user_friends INT UNSIGNED;
+	DECLARE recent_post INT UNSIGNED;
+	DECLARE row_not_found TINYINT DEFAULT FALSE;
+	DECLARE post_cursor CURSOR FOR
+	    SELECT f.friend_id
+			FROM friends f
+            WHERE f.user_id = posting_user_id;
+            
+	DECLARE CONTINUE HANDLER FOR NOT FOUND
+	    SET row_not_found = TRUE;
+	
+    -- Creates the post
+	INSERT INTO posts
+	    (user_id, content)
+	VALUES
+	    (posting_user_id, posting_user_content);
+	
+	SET recent_post = LAST_INSERT_ID();
+	
+    -- Creates the notification posts
+	OPEN post_cursor;
+	post_loop : LOOP
+	
+	FETCH post_cursor INTO user_friends;
+    
+	IF row_not_found THEN
+	    LEAVE post_loop;
+	END IF;
+        
+	INSERT INTO notifications
+	    (user_id, post_id)
+	VALUES
+	    (user_friends, recent_post);
+            
+	END LOOP post_loop;
+        
+	CLOSE post_cursor;
+END;;
  
 
 DELIMITER ; 
+
+INSERT INTO users
+      (user_id, first_name, last_name, email)
+    VALUES
+      (6, 'Larry', 'Hemsworth', 'larry@earth.com');
+      
+INSERT INTO friends
+      (user_id, friend_id)
+    VALUES
+      (6, 3);
+      
+ INSERT INTO friends
+      (user_id, friend_id)
+    VALUES
+      (3, 6);
+      
+CALL add_post(6, "I'm dull as a rock. Ugh, even that analogy was boring.");
+
+CALL add_post(1, "I've narrowed it down to two possibilities: Yes and No.");
+
+SELECT first_name, last_name, post_id, content
+      FROM notification_posts
+      WHERE user_id = 3;
