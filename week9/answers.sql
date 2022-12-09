@@ -168,29 +168,5 @@ BEGIN
         
 	CLOSE post_cursor;
 END;;
- 
 
 DELIMITER ; 
-
-INSERT INTO users
-      (user_id, first_name, last_name, email)
-    VALUES
-      (6, 'Larry', 'Hemsworth', 'larry@earth.com');
-      
-INSERT INTO friends
-      (user_id, friend_id)
-    VALUES
-      (6, 3);
-      
- INSERT INTO friends
-      (user_id, friend_id)
-    VALUES
-      (3, 6);
-      
-CALL add_post(6, "I'm dull as a rock. Ugh, even that analogy was boring.");
-
-CALL add_post(1, "I've narrowed it down to two possibilities: Yes and No.");
-
-SELECT first_name, last_name, post_id, content
-      FROM notification_posts
-      WHERE user_id = 3;
